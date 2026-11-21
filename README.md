@@ -30,7 +30,9 @@ The system provides:
 | DICOM Processing | pydicom |
 | Database | SQLite |
 | Data Versioning | DVC |
-| Containerization | Docker Compose |
+| Containerization | Docker / Docker Compose |
+| Container Registry | Amazon ECR |
+| Cloud Deployment | AWS ECS Fargate |
 | Testing | Pytest |
 
 DVC metadata is included in the repository. A remote DVC storage location is not currently configured.
@@ -60,10 +62,9 @@ The output layer uses sigmoid activation because this is a multi-label classific
 
 ## 4. System Architecture
 
-``` mermaid
+```mermaid
 flowchart TB
     U["User / Radiologist"] --> UI["Streamlit Interface"]
-
     UI --> API["FastAPI Backend"]
 
     API -->|PNG / JPEG Upload| IMG["Image Preprocessing"]
@@ -82,18 +83,6 @@ flowchart TB
 
     DB --> API
     API -->|Predictions, Grad-CAM,<br/>Study History| UI
-
-    classDef interface fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
-    classDef backend fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
-    classDef processing fill:#fef3c7,stroke:#d97706,color:#78350f
-    classDef model fill:#dcfce7,stroke:#16a34a,color:#14532d
-    classDef storage fill:#fce7f3,stroke:#db2777,color:#831843
-
-    class U,UI interface
-    class API backend
-    class IMG,ORTHANC,DICOM processing
-    class MODEL,PRED,CAM model
-    class DB storage
 ```
 
 
@@ -236,6 +225,49 @@ The evaluation artifacts include per-class metrics and the selected classificati
 ### Docker Deployment
 
 ![Docker Containers](screenshots/09-docker-containers.png)
+
+### AWS Deployment
+
+The application is deployed on AWS ECS Fargate using Docker containers stored in Amazon ECR.
+
+#### Deployment Architecture
+
+- Frontend: Streamlit
+- Backend: FastAPI
+- DICOM Server: Orthanc
+- Container Registry: Amazon ECR
+- Container Orchestration: Amazon ECS Fargate
+- Region: ap-southeast-2 (Sydney)
+
+#### Accessing the Application
+
+The application is hosted on a public Fargate task IP and is accessible through:
+
+http://<PUBLIC_IP>:8501
+
+The public IP is dynamically assigned and may change when the task is restarted. The application is available only while the ECS task is running.
+
+#### Starting the AWS Deployment
+
+1. Open the AWS ECS Console.
+2. Navigate to `medical-imaging-cluster`.
+3. Select `medical-imaging-service`.
+4. Choose **Update service**.
+5. Set **Desired tasks** to `1`.
+6. Wait until the task reaches `RUNNING`.
+7. Open the running task and retrieve its public IP from the **Networking** section.
+8. Access the application at `http://<PUBLIC_IP>:8501`.
+
+#### Stopping the AWS Deployment
+
+1. Open `medical-imaging-service`.
+2. Choose **Update service**.
+3. Set **Desired tasks** to `0`.
+4. Confirm that running tasks reach zero.
+
+ECS automatically replaces individually stopped tasks when the desired count remains `1`. Therefore, update the service's desired count to `0` rather than stopping an individual task.
+
+Stopping the task stops Fargate compute billing for that task. Other AWS resources, including container images and stored logs, may continue to incur charges.
 
 ## 10. Run with Docker Compose
 

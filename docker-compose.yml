@@ -15,6 +15,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+      platforms:
+        - linux/amd64
     container_name: medical-imaging-api
     ports:
       - "8000:8000"
@@ -26,11 +28,14 @@ services:
       - orthanc
     volumes:
       - ./data:/app/data
+    image: 166917387733.dkr.ecr.ap-southeast-2.amazonaws.com/medical-imaging-ai:api
 
   streamlit:
     build:
       context: .
       dockerfile: Dockerfile.streamlit
+      platforms:
+        - linux/amd64
     container_name: medical-imaging-streamlit
     ports:
       - "8501:8501"
@@ -38,6 +43,7 @@ services:
       API_BASE_URL: http://api:8000
     depends_on:
       - api
+    image: 166917387733.dkr.ecr.ap-southeast-2.amazonaws.com/medical-imaging-ai:streamlit
 
 volumes:
   orthanc_data:
