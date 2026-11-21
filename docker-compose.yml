@@ -1,0 +1,43 @@
+services:
+
+  orthanc:
+    image: orthancteam/orthanc
+    container_name: orthanc
+    ports:
+      - "8042:8042"
+      - "4242:4242"
+    environment:
+      ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
+    volumes:
+      - orthanc_data:/var/lib/orthanc/db
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: medical-imaging-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      ORTHANC_URL: http://orthanc:8042
+    depends_on:
+      - orthanc
+    volumes:
+      - ./data:/app/data
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: medical-imaging-streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      API_BASE_URL: http://api:8000
+    depends_on:
+      - api
+
+volumes:
+  orthanc_data:

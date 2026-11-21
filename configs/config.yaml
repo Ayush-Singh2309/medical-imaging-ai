@@ -1,0 +1,12 @@
+dataset:
+  image_size: 224
+  channels: 3
+  batch_size: 32
+
+training:
+  random_seed: 42
+
+model:
+  architecture: DenseNet121
+  pretrained: true
+  num_classes: 14

@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install streamlit requests pandas
+
+COPY src/ ./src/
+
+ENV PYTHONPATH=/app/src
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "src/medical_imaging_ai/app.py", "--server.address=0.0.0.0", "--server.port=8501"]

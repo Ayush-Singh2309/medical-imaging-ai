@@ -1,0 +1,44 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+.venv-streamlit/
+
+# macOS
+.DS_Store
+
+# Python
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Model checkpoints
+models/densenet121_initial.keras
+
+# Generated application data
+data/processed/*.db
+data/processed/studies/
+data/processed/retrieved_sample.dcm
+
+# DVC cache
+.dvc/cache/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Keep the final inference model and evaluation artifacts
+!models/best_model.keras
+!models/training_history.json
+!models/history_full_training.json
